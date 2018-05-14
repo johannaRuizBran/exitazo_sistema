@@ -61,7 +61,26 @@ class InventoryController extends Controller
 
     public function showCutStadisticsView()
     {
-        return view('showCutStadistics');
+        if ($initialDate == 0) {
+             $initialDate = date('Y-m-d');
+             if ($finalDate == 0) {
+                    $finalDate = $initialDate;
+             }
+        }
+        else if ($finalDate == 0 && $initialDate != 0) {
+            $finalDate = $initialDate;
+        }
+        $initialDate = date_format(date_create($initialDate), 'Y-m-d');
+        $finalDate = date_format(date_create($finalDate), 'Y-m-d');
+        $initialDate = date_format(date_create($initialDate), 'Y-m-d');
+        $finalDate = date_format(date_create($finalDate), 'Y-m-d');
+        $pagosContado = DB::select('call pagosContado(?,?)',[$initialDate,$finalDate]);
+        $ventasDepartamento = DB::select('call ventasDepartamento(?,?)',[$initialDate,$finalDate]);
+        $pagoClientes = DB::select('call pagoClientes(?,?)',[$initialDate,$finalDate]);
+        $repagoProveedoressults = DB::select('call pagoProveedores(?,?)',[$initialDate,$finalDate]);
+        $reporteMovimientos = DB::select('call reporteMovimientos(?,?)',[$initialDate,$finalDate]);
+        return view('showCutStadistics', compact('pagosContado', 'ventasDepartamento', 'pagoClientes', 'repagoProveedoressults', 'reporteMovimientos'));
+        //return view('showCutStadistics');
     }
 
     public function departmentView()
@@ -201,16 +220,18 @@ class InventoryController extends Controller
 
     public function sellingsByPeriod($initialDate, $finalDate) 
     {
-        /*SELECT PRODUCTOS.codigoProducto, PRODUCTOS.descripcion, PRODUCTOS.precioCosto, PRODUCTOS.precioVenta, PRODUCTOS.precioMayoreo, PRODUCTOS.nombreDepartamento, SUM(PRODUCTOS_COMPRADOS.cantidad) as cantidad
-   FROM PRODUCTOS LEFT JOIN PRODUCTOS_COMPRADOS 
-   ON PRODUCTOS.codigoProducto = PRODUCTOS_COMPRADOS.codigoProducto 
-   inner join HISTORIAL 
-   on PRODUCTOS_COMPRADOS.idHistorial = HISTORIAL.id and HISTORIAL.fecha between '2018-11-14' and '2018-12-20'
-   GROUP BY PRODUCTOS.codigoProducto, PRODUCTOS.descripcion
-*/
-        $results = DB::select('call my_stored_procedure(?,?)',[$initialDate,$finalDate]);
-        echo $results[0]->codigoProducto;
+        if ($initialDate == 0) {
+             $initialDate = date('Y-m-d');
+             if ($finalDate == 0) {
+                    $finalDate = $initialDate;
+             }
+        }
+        else if ($finalDate == 0 && $initialDate != 0) {
+            $finalDate = $initialDate;
+        }
+        $initialDate = date_format(date_create($initialDate), 'Y-m-d');
+        $finalDate = date_format(date_create($finalDate), 'Y-m-d');
+        $results = DB::select('call ventasPeriodo(?,?)',[$initialDate,$finalDate]);
         return view('sellingPeriod', compact('results'));
-        
     }
 }
