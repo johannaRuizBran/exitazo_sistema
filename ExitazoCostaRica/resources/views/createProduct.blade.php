@@ -14,7 +14,10 @@
       <div class="form-group">
           <label for="inputCodigoBarras" class="control-label col-xs-2">Código de barras</label>
           <div class="col-xs-5">
-              <input type="text" class="form-control" name="inputCodigoBarras" id="inputCodigoBarras" placeholder="Nombre completo">
+              <input type="text" id="inputCodeBarGenerator" onkeyup="codeBarGenerator()" class="form-control" name="inputCodigoBarras" id="inputCodigoBarras" placeholder="Nombre completo">
+          </div>
+          <div class="col-xs-5">
+              <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-print"></span>&nbsp Imprimir</button>
           </div>
       </div>
       <div class="form-group">
@@ -68,8 +71,11 @@
           </div>
       </div>
   </form>
+  <canvas id="barcode"></canvas>
 </div>
 </body>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="{{asset('plugins/barcode/JsBarcode.all.min.js')}}"></script>
 <script src="{{asset('plugins/sweetalert2/sweetalert2.min.js')}}"></script>
 <script>
   window.onload = function() {loadPage()};
@@ -79,5 +85,11 @@
     document.getElementById("navInventories").style.color = "white";
     document.getElementById("buttonProducts").style.background = "#ccc";    
   }
+
+  function codeBarGenerator() {
+    var input = document.getElementById("inputCodeBarGenerator").value;
+    $("#barcode").JsBarcode(input);
+  }
+  
 </script>
 </html>
