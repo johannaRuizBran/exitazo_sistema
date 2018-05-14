@@ -2,6 +2,14 @@
 <html>
 <head>
   <script src="{{asset('js/globales.js')}}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
   @include('partials.style')
 </head>
 <body>
@@ -13,7 +21,7 @@
   <div class="row">
      <div id="custom-search-input">
           <div class="input-group col-md-12">                          
-              <input name="filterSearchInput" id="filterSearchInput" type="text" class="  search-query form-control" placeholder="Código del producto" />
+              <input name="filterSearchInput2" id="filterSearchInput2" type="text" class="  search-query form-control" placeholder="Código del producto" />
               <span class="input-group-btn">
                   <button class="btn bg-dark" type="submit" onclick="agregarAListaFactura()">
                       <span class=" glyphicon glyphicon-search"></span>
@@ -30,7 +38,7 @@
 <br>
 <br>
 <div class="container">
-    <table id="contentTable" class="table table-striped">
+    <table id="contentTable1" class="table table-striped">
        <thead>
           <tr class="row-name"> 
              <th>Código de barras</th>
@@ -70,11 +78,47 @@
       <input type="radio" name="formaDePago" id="formaDePagoC" value="credito" checked> Crédito<br>
       <input type="radio" name="formaDePago" id="formaDePagoE" value="efectivo"> Efectivo<br>
     </h3>    
-    <h3 style="position: absolute;">Cliente: <input style="width: 315px" type="text" name="nombreCliente"><a href="/buscarCliente">&nbsp<span class=" glyphicon glyphicon-search"></span></a>
+    <h3 style="position: absolute;">Cliente: <input style="width: 315px" type="text" name="nombreCliente" id="nombreCliente"><button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo">&nbsp<span class=" glyphicon glyphicon-search"></span></button>
     </h3>
-    <br>
-    <br>
     <br>    
+    <br>    
+    <br>
+    <div id="demo" class="collapse">
+      <br>
+      @include('partials.filterSearchBar')
+      <br>
+      <div class="container">  
+        <table id="contentTable" class="table table-striped">
+         <thead>
+            <tr class="row-name">
+               <th>Número</th>
+               <th>Nombre</th>
+               <th>Dirección</th>
+               <th>Teléfono</th>
+               <th>Límite de crédito</th>
+               <th>Saldo actual</th>
+            </tr>
+         </thead>   
+         <tbody>  
+            @foreach($clientes as $clientes)           
+              <tr class="row-content">
+                <td>{{$clientes->numeroPersona}}</td>
+                 <td>{{$clientes->nombrePersona}}</td>
+                 <td>{{$clientes->direccion}}</td>
+                 <td>{{$clientes->telefono}}</td>
+                 <td>{{$clientes->limiteDeCredito}}</td>
+                 <td>{{$clientes->saldoActual}}</td>
+                 <td>
+                    <a title="Seleccionar" class="btn btn-primary" onclick="cambiarUsuario('{{$clientes->numeroPersona}}','{{$clientes->nombrePersona}}')" aria-label="Settings">
+                      <span class="glyphicon glyphicon-send"></span>
+                    </a>
+                 </td>
+              </tr>     
+            @endforeach      
+         </tbody>
+        </table>
+      </div>
+    </div>        
     <h3 style="position: absolute;">Monto: <input style="width: 320px" type="text" name="montoCliente" id="montoCliente" oninput="aumentarMonto()">
       </h3>
       <div style="position: absolute; margin-left: 30%">      
@@ -86,8 +130,23 @@
   </div>  
 </body>
 <script>
-
-
+  function findCoincidencesInRows() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("filterSearchInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("contentTable");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    } 
+  }
+}
 
 function promocion(){  
   $.ajax({
@@ -124,6 +183,11 @@ function promocion(){
   });
 }
 
+function cambiarUsuario(numeroPersona, nombrePersona){
+  cliente_nombre= nombrePersona;
+  cliente_id= numeroPersona;    
+  document.getElementById("nombreCliente").value= cliente_nombre;    
+}
 
 function irASalesAndReturnVent(){
   var dt = new Date();
@@ -150,6 +214,8 @@ function mensajeParaUsuario(titulo, msj, icon){
 
 function limpiarTodosDatos(){  
   totalP= 0; 
+  cliente_id = "ninguno";
+  cliente_nombre= "ninguno";
   document.getElementById("nombreCliente").value= "";
   document.getElementById("montoCliente").value= "";
   document.getElementById("total").innerHTML= "";
@@ -167,8 +233,8 @@ function insertarPagoEnTablaHist(formaDePago,listaDeProductos,
   var hora= cad=dt.getHours()+":"+dt.getMinutes();   
   listaDeCodigos=[];  
   for (var i = 0; i < listaFactura.length; i++) {
-    listaDeCodigos.push([listaFactura[i][0][0].codigoProducto,listaFactura[i][1]]);    
-  }    
+    listaDeCodigos.push([listaFactura[i][0][0].codigoProducto,listaFactura[i][1],listaFactura[i][2]]);    
+  }      
   var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');  
   $.ajax({      
       url: '/crear/historialCompra',
@@ -181,10 +247,10 @@ function insertarPagoEnTablaHist(formaDePago,listaDeProductos,
         prodVentaAct: prodVentaAct,
         fecha: fecha,
         hora: hora},
-      dataType: 'JSON',      
+        dataType: 'JSON',      
       success: function (data) { 
         limpiarTodosDatos();
-        console.log(data);
+        console.log(data);        
         titulo= "Correcto";
         msj= "Se ha comprado exitosamente";
         icon="success";
@@ -209,6 +275,9 @@ function pagar(){
   prodVentaAct= document.getElementById("prodVentaAct").innerHTML;
   if(PagoC.checked){
     formaDePago=PagoC.value;
+    if(cliente_id != "ninguno"){
+      cliente= cliente_id;    
+    }      
   }
   else{
     formaDePago=PagoE.value;
@@ -304,7 +373,7 @@ function eliminarDeLista(id){
 }
 
 function agregarAListaFactura(){
-  var elemento=document.getElementById('filterSearchInput').value;  
+  var elemento=document.getElementById('filterSearchInput2').value;  
   $.ajax({
     url:"/facturas/insrtListProv/"+elemento,
     type:"GET",

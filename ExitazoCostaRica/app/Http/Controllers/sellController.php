@@ -41,15 +41,17 @@ class sellController extends Controller
         $listaFactura =$request->listaFactura;
         $cliente= $request->cliente;
         $monto= $request->monto;
-        $cantidadProductos= $request->prodVentaAct;
+        $cantidadProductos= $request->prodVentaAct;        
         $resultado= "Error no se han introducido los datos de forma correcta";
 
-        $insertHist=DB::insert('insert into HISTORIAL(fecha,monto,cliente,tipoPago,cantidadArticulos,hora) values(?,?,?,?,?,?)',[$fecha,$monto,$cliente,$formaDePago,$cantidadProductos,$hora]);
+        DB::update('update CLIENTES set saldoActual=saldoActual + ? where numeroPersona = ?',[$monto,$cliente]);
+
+        $insertHist=DB::insert('insert into HISTORIAL(fecha,monto,cliente,tipoPago,cantidadArticulos,hora) values(?,?,?,?,?,?)',[$fecha,$monto,$cliente,$formaDePago,$cantidadProductos,$hora]);        
         if($insertHist){
             $idReg = DB::table('HISTORIAL')->orderBy('id', 'DESC')->get();
             for ($i=0; $i < sizeof($listaFactura); $i++) {               
-                DB::insert('insert into PRODUCTOS_COMPRADOS(idHistorial,cantidad,codigoProducto) values(?,?,?)',
-                [$idReg[0]->id, $listaFactura[$i][1],$listaFactura[$i][0]]);
+                DB::insert('insert into PRODUCTOS_COMPRADOS(idHistorial,cantidad,codigoProducto,monto) values(?,?,?,?)',
+                [$idReg[0]->id, $listaFactura[$i][1],$listaFactura[$i][0],$listaFactura[$i][2]]);
                 
                 DB::update('update PRODUCTOS set cantidadDeProduct=cantidadDeProduct - ? where codigoProducto = ?',[$listaFactura[$i][1],$listaFactura[$i][0]]);
             }

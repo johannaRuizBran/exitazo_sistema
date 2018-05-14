@@ -39,9 +39,7 @@ Route::get('/registro', function () {
     return view('auth/register');
 });
 
-Route::get('/buscarCliente', function () {
-    return view('findCustomer');
-});
+Route::get('/buscarCliente', 'CustomerController@obtenerClientes');
 
 Route::post('/prueba', 'Auth/LoginController@authenticate');
 
@@ -83,6 +81,7 @@ Route::get('/reporteDeMovimiento', 'InventoryController@movementReportView');
 Route::get('/entradas', 'InventoryController@inComingView');
 Route::get('/salidas', 'InventoryController@outComingView');
 Route::get('/tiqueteVentasDevoluciones', 'InventoryController@billSalesAndReturnsInfoView');
+
 Route::get('/ventas', 'InventoryController@sellingView');
 
 
@@ -118,6 +117,5 @@ Route::get('/tiqueteVentasDevoluciones/{id}/{total}/{tipoPago}', 'InventoryContr
 Route::get('/ventasDevoluciones/{fecha}', 'InventoryController@salesAndReturnsView');
 Route::get('/facturas/insrtListProv/{id}', 'sellController@findProduct');
 Route::get('/obtener/promociones/sell', 'sellController@obtenerPromocion');
-
-
+Route::post('/crear/historialCompra', 'sellController@insertarEnHistorial');
 

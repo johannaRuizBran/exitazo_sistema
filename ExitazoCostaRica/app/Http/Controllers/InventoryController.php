@@ -30,7 +30,7 @@ class InventoryController extends Controller
     {
         $clientes = DB::table('CLIENTES')->select('numeroPersona', 'nombrePersona','direccion','telefono','limiteDeCredito',
             'saldoActual')->get();        
-        return view('customers', compact('clientes'));
+        return view('findCustomer', compact('clientes'));
     }
 
     public function createClient(Request $request){
@@ -162,7 +162,9 @@ class InventoryController extends Controller
     public function sellingView()
     {
         $lista=[];
-        return view('selling',compact('lista'));
+        $clientes = DB::table('CLIENTES')->select('numeroPersona', 'nombrePersona','direccion','telefono','limiteDeCredito',
+            'saldoActual')->get(); 
+        return view('selling',compact('lista','clientes'));
     }
 
     public function movementReportView()

@@ -2,6 +2,7 @@
 <html>
 <head>
   @include('partials.style')
+  <script src="{{asset('js/globales.js')}}"></script>
 </head>
 <body>
 @include('partials.nav')
@@ -22,19 +23,35 @@
          <th>Saldo actual</th>
       </tr>
    </thead>   
-   <tbody>     
+   <tbody>  
+      @foreach($clientes as $clientes)           
         <tr class="row-content">
+          <td>{{$clientes->numeroPersona}}</td>
+           <td>{{$clientes->nombrePersona}}</td>
+           <td>{{$clientes->direccion}}</td>
+           <td>{{$clientes->telefono}}</td>
+           <td>{{$clientes->limiteDeCredito}}</td>
+           <td>{{$clientes->saldoActual}}</td>
            <td>
-              <a title="Seleccionar" class="btn btn-primary" href="/seleccionar/cliente" aria-label="Settings">
+              <a title="Seleccionar" class="btn btn-primary" onclick="cambiarUsuario({{$clientes->numeroPersona}})" aria-label="Settings">
                 <span class="glyphicon glyphicon-send"></span>
               </a>
            </td>
         </tr>     
+      @endforeach      
    </tbody>
   </table>
 </div>
 </body>
+
 <script>
+function cambiarUsuario(valorPersona){
+  alert(cliente_id);
+  cliente_id= valorPersona;
+  alert("Desde clientes vista"+cliente_id);
+  window.location.href="/ventas";
+}
+
 window.onload = function() {loadSite()};
 function loadSite()
 {
