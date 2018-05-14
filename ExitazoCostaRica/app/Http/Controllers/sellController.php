@@ -46,6 +46,9 @@ class sellController extends Controller
 
         DB::update('update CLIENTES set saldoActual=saldoActual + ? where numeroPersona = ?',[$monto,$cliente]);
 
+        DB::insert('insert into MOVIMIENTOS_CAJAS(tipo,motivo,nombreLocal,montoDinero,fecha) values(?,?,?,?,?)',
+            ['credito','venta de producto','nombreLocal',$monto,$fecha]);        
+
         $insertHist=DB::insert('insert into HISTORIAL(fecha,monto,cliente,tipoPago,cantidadArticulos,hora) values(?,?,?,?,?,?)',[$fecha,$monto,$cliente,$formaDePago,$cantidadProductos,$hora]);        
         if($insertHist){
             $idReg = DB::table('HISTORIAL')->orderBy('id', 'DESC')->get();
