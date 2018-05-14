@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script src="{{asset('js/globales.js')}}"></script>
   @include('partials.style')
 </head>
 <body>
@@ -86,12 +87,7 @@
 </body>
 <script>
 
-var listaFactura= [];
-var billNumber = 0;
-var elementRow= 0;
-var listaPendientes= [];
-var selectedBill= 0;
-var totalP= 0;
+
 
 function promocion(){  
   $.ajax({

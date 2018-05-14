@@ -84,7 +84,10 @@ Route::get('/entradas', 'InventoryController@inComingView');
 Route::get('/salidas', 'InventoryController@outComingView');
 Route::get('/tiqueteVentasDevoluciones', 'InventoryController@billSalesAndReturnsInfoView');
 Route::get('/ventas', 'InventoryController@sellingView');
-Route::get('/ventasPorPeriodo/{initialDate}/{$finalDate}', 'InventoryController@sellingsByPeriod');
+
+
+Route::get('/ventasPorPeriodo/{fecha}', 'InventoryController@sellingsByPeriod');
+Route::get('/ventas/periodo/obtener', 'InventoryController@getSellingPeriodData');
 
 
 Route::get('/facturas/insrtListProv/{id}', 'sellController@findProduct');

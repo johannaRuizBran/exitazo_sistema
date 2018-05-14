@@ -12,9 +12,12 @@
     <link href="{{asset('images/sombrero.ico')}}"" rel="icon">
 
     <!-- Styles -->
+    <script src="{{asset('js/globales.js')}}"></script>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/css/base.css') }}" rel="stylesheet"> 
+    
+    
 
 </head>
 <body>

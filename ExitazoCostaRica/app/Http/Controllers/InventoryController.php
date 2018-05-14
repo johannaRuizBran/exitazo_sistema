@@ -199,7 +199,6 @@ class InventoryController extends Controller
         return view('outComing',compact('salidas'));
     }
 
-
     public function createInComing(Request $request)
     {        
         $inputMontoDinero = $request->input('inputMonto');
@@ -218,20 +217,29 @@ class InventoryController extends Controller
         return view('inComing', compact('entradas'));
     }
 
-    public function sellingsByPeriod($initialDate, $finalDate) 
-    {
+    public function sellingsByPeriod($fecha) 
+    {    
+        $initialDate = $fecha;
+        $finalDate = $fecha;
+        $results = DB::select('call ventasPeriodo(?,?)',[$initialDate,$finalDate]);
+        return view('sellingPeriod', compact('results'));
+    }
+
+    public function getSellingPeriodData(Request $request){
+        $initialDate= $request->initialDate;
+        $finalDate= $request->finalDate;
         if ($initialDate == 0) {
-             $initialDate = date('Y-m-d');
-             if ($finalDate == 0) {
-                    $finalDate = $initialDate;
-             }
+            $initialDate = date('Y-m-d');
+            if ($finalDate == 0) {
+                $finalDate = $initialDate;
+            }
         }
         else if ($finalDate == 0 && $initialDate != 0) {
             $finalDate = $initialDate;
         }
         $initialDate = date_format(date_create($initialDate), 'Y-m-d');
         $finalDate = date_format(date_create($finalDate), 'Y-m-d');
-        $results = DB::select('call ventasPeriodo(?,?)',[$initialDate,$finalDate]);
-        return view('sellingPeriod', compact('results'));
+        $results = DB::select('call ventasPeriodo(?,?)',[$initialDate,$finalDate]);                               
+        return $results;
     }
 }

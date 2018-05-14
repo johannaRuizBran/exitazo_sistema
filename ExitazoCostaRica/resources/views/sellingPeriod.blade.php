@@ -19,21 +19,28 @@
     <div class="form-group" style="position: absolute;">
         <div class="col-xs-5 date">
             <div class="input-group input-append date" id="datePicker">
-                <input type="text" class="form-control" name="date" />
+                <input type="text" class="form-control" value="0" name="date" id="date1" />
                 <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
             </div>
         </div>
     </div>
   </div>
       <!-- Include Bootstrap Datepicker -->
-  <div class="form-group" style="margin-left: 55%;width: 100%">
+  <div class="form-group" style="margin-left: 55% ;width: 100%">
       <div class="col-xs-5 date">
           <div class="input-group input-append date" id="datePicker2">
-              <input type="text" class="form-control" name="date" />
+              <input type="text" class="form-control" value="0" name="date" id="date2"/>
               <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
           </div>
       </div>
   </div>
+
+  <div class="form-group" style="margin-left: 55%;width: 100%">
+      <div class="col-xs-5 date">
+          <a class="btn btn-primary" onclick="obtenerDatos()">&nbsp<span class=" glyphicon glyphicon-search"></span></a>
+      </div>
+  </div>
+
 </div>
 <br>
 @include('partials.filterSearchBar')
@@ -144,6 +151,35 @@ function findCoincidencesInRows() {
       }
     }       
   }
+}
+function getReport() {
+  var initial = document.getElementById("date1").value;
+  var final = document.getElementById("date2").value;
+  console.log(initial);
+  var initial
+  //window.location.href = "/ventasPorPeriodos/{"+initial+"}/{"+final+"}";
+}
+
+function obtenerDatos(){  
+  var initial = '2018-05-13';// document.getElementById("date1").value;
+  var final ='2018-12-31';// document.getElementById("date2").value;   
+  $.ajax({
+    url:"/ventas/periodo/obtener",
+    type:"GET",  
+    data: {
+      initialDate:initial,
+      finalDate:final
+    } , 
+    dataType: 'text',
+    success: function(data){                
+      var json = JSON.parse(data);              
+      console.log(json);
+    },
+    error: function(error){
+         console.log("Error:");
+         console.log(error);
+    }
+  });
 }
 </script>
 </html>
