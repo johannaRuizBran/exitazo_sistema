@@ -49,8 +49,9 @@
 <div class="container">
   <div class="row">
     <h2 style="">Productos en la venta actual:&nbsp <span id="prodVentaAct">0</span></h2>
-    <h2 style="float: right; margin-right: 5%" id="total">₡:&nbsp <span>0</span></h2>
+    <h2 style="float: right; margin-right: 5%" id="total">₡:&nbsp <span>0</span></h2>    
     <a href="#" onclick="pagar()" rel="nofollow" class="btn btn-default cboxElement" style="float: right; margin-right: 5%">F12 Cobrar</a>
+    <a href="#" onclick="promocion()" rel="nofollow" class="btn btn-default cboxElement" style="float: right; margin-right: 5%">Aplicar Promocion</a>
   </div>
 </div>
 <div class="container">
@@ -73,54 +74,191 @@
     <br>
     <br>
     <br>    
-    <h3 style="position: absolute;">Monto: <input style="width: 320px" type="text" name="nombreCliente">
-    </h3>
-    <div style="position: absolute; margin-left: 30%">      
-      <h3 >Cambio:&nbsp <span>0</span></h3>  
-    </div>    
-    <a href="#" rel="nofollow" class="btn btn-default cboxElement" style="float: right; margin-right: 5%">Reimprimir último tiquete</a> 
-  <a href="/ventasDevoluciones" rel="nofollow" class="btn btn-default cboxElement" style="float: right; margin-right: 1.5%">Ventas del dia y devoluciones</a>
-  </div>
-</div>
+    <h3 style="position: absolute;">Monto: <input style="width: 320px" type="text" name="montoCliente" id="montoCliente" oninput="aumentarMonto()">
+      </h3>
+      <div style="position: absolute; margin-left: 30%">      
+        <h3 >Cambio:&nbsp <span id="cambioInpu">0</span></h3>  
+      </div>    
+      <a href="" rel="nofollow" class="btn btn-default cboxElement" style="float: right; margin-right: 5%">Reimprimir último tiquete</a> 
+    <button onclick="irASalesAndReturnVent()" class="btn btn-default cboxElement" style="float: right; margin-right: 1.5%">Ventas del dia y devoluciones</button>
+    </div>
+  </div>  
 </body>
 <script>
+
 var listaFactura= [];
 var billNumber = 0;
 var elementRow= 0;
 var listaPendientes= [];
 var selectedBill= 0;
+var totalP= 0;
 
-function insertarPagoEnTablaHist(){
-  
+function promocion(){  
+  $.ajax({
+    url:"/obtener/promociones/sell",
+    type:"GET",
+    dataType: 'text',
+    success: function(data){                
+      var json = JSON.parse(data);
+      var hayPromo= 0;
+      var promocionesAplicadas= "Se han aplicado las promociones: ";
+      console.log(json);                 
+      for (var j = 0; j < listaFactura.length; j++) {                    
+        for (var i = 0; i < json.length; i++) {          
+          if(listaFactura[j][0][0].codigoProducto == json[i].codigoProducto && listaFactura[j][1] >= json[i].cantidadProdMinimo){
+            listaFactura[j][0][0].precioVenta= json[i].precioUnit;
+            listaFactura[j][2]=listaFactura[j][1] * listaFactura[j][0][0].precioVenta;
+            promocionesAplicadas= promocionesAplicadas+"\n--->"+ json[i].nombrePromocion;
+            hayPromo= 1;
+          }
+        }  
+      }     
+      if(hayPromo== 1){
+        alert(promocionesAplicadas);  
+      }
+      else{
+        alert("no se detectaron promociones");
+      }
+      agregarFilaTabla();
+    },
+    error: function(error){
+         console.log("Error:");
+         console.log(error);
+    }
+  });
 }
 
+
+function irASalesAndReturnVent(){
+  var dt = new Date();
+  var month = dt.getMonth()+1;
+  var day = dt.getDate();
+  var year = dt.getFullYear();
+  var fecha= year + '-' + month + '-' + day;  
+  window.location.href="/ventasDevoluciones/"+fecha;
+}
+
+function aumentarMonto(){
+  montoInsertado = parseInt(document.getElementById("montoCliente").value); 
+  total=montoInsertado-totalP;     
+  document.getElementById("cambioInpu").innerHTML= "₡:"+ total; 
+}
+
+function mensajeParaUsuario(titulo, msj, icon){
+  swal({
+    title: titulo,
+    text: msj,
+    icon: icon,
+  })
+}
+
+function limpiarTodosDatos(){  
+  totalP= 0; 
+  document.getElementById("nombreCliente").value= "";
+  document.getElementById("montoCliente").value= "";
+  document.getElementById("total").innerHTML= "";
+  document.getElementById("cambioInpu").innerHTML= "₡:"+ totalP; 
+  document.getElementById("total").innerHTML= "₡:"+ totalP;
+}
+
+function insertarPagoEnTablaHist(formaDePago,listaDeProductos,
+  cliente,monto,prodVentaAct){     
+  var dt = new Date();
+  var month = dt.getMonth()+1;
+  var day = dt.getDate();
+  var year = dt.getFullYear();
+  var fecha= year + '-' + month + '-' + day;
+  var hora= cad=dt.getHours()+":"+dt.getMinutes();   
+  listaDeCodigos=[];  
+  for (var i = 0; i < listaFactura.length; i++) {
+    listaDeCodigos.push([listaFactura[i][0][0].codigoProducto,listaFactura[i][1]]);    
+  }    
+  var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');  
+  $.ajax({      
+      url: '/crear/historialCompra',
+      type: 'POST',      
+      data: {_token: CSRF_TOKEN, 
+        formaDePago:formaDePago,
+        listaFactura: listaDeCodigos,
+        cliente:cliente,
+        monto: totalP,
+        prodVentaAct: prodVentaAct,
+        fecha: fecha,
+        hora: hora},
+      dataType: 'JSON',      
+      success: function (data) { 
+        limpiarTodosDatos();
+        console.log(data);
+        titulo= "Correcto";
+        msj= "Se ha comprado exitosamente";
+        icon="success";
+        mensajeParaUsuario(titulo, msj, icon);        
+      },
+      error: function(error){
+        titulo= "Error";
+        msj= "Error: no se ha realizado la compra correctamente";
+        icon="error";
+        mensajeParaUsuario(titulo, msj, icon);
+      }
+  });     
+}
+
+
 function pagar(){
-  formaDePago= "";
+  formaDePago= "";    
   PagoE= document.getElementById("formaDePagoE");
   PagoC= document.getElementById("formaDePagoC");  
+  cliente= document.getElementById("nombreCliente").value;  
+  monto= document.getElementById("montoCliente").value;
+  prodVentaAct= document.getElementById("prodVentaAct").innerHTML;
   if(PagoC.checked){
     formaDePago=PagoC.value;
   }
   else{
     formaDePago=PagoE.value;
   }
-  listaDeProductos= listaFactura;
-  console.log("A pagado");
-  console.log(formaDePago);
-  console.log(listaDeProductos);
-  //deleteBill();  
+  if(listaFactura.length ==0){
+    titulo= "Error";
+    msj= "Error: No se poseen productos dentro de la compra";
+    icon="error";
+    mensajeParaUsuario(titulo, msj, icon);    
+    return;
+  }
+  listaDeProductos= listaFactura;    
+  try {
+    insertarPagoEnTablaHist(formaDePago,listaDeProductos,
+    cliente,monto,prodVentaAct);
+    deleteBill();
+  }
+  catch(error) {
+    alert("Error al insertar datos");
+  }    
 }
 
 function seleccionarElementoTabla(id) {
   elementRow= id;    
 }
 
+function aplicarMayoreo(){  
+  for (var i = 0; i< listaFactura.length; i++) {        
+    listaFactura[i][3]= 1;
+    listaFactura[i][2]=listaFactura[i][1] * listaFactura[i][0][0].precioMayoreo;
+  }
+}
   
 function agregarFilaTabla(){  
   var total= 0;
   var productosEnVentaActual= 0;
+  var precioVenta;
   document.getElementById("tableBody").innerHTML= "";
   for (var i = 0; i< listaFactura.length; i++) {    
+    if(listaFactura[i][3] == 0){
+      precioVenta= listaFactura[i][0][0].precioVenta;  
+    }
+    else{
+      precioVenta= listaFactura[i][0][0].precioMayoreo;  
+    } 
+
     var tr = document.createElement('tr');
     tr.className= "row-content";
     
@@ -131,7 +269,7 @@ function agregarFilaTabla(){
     td_descripcion.innerHTML = listaFactura[i][0][0].descripcion;
 
     var td_precioVenta = document.createElement('td');
-    td_precioVenta.innerHTML = listaFactura[i][0][0].precioVenta;
+    td_precioVenta.innerHTML = precioVenta;
     
     var td_cantidad = document.createElement('td');
     td_cantidad.innerHTML = listaFactura[i][1];
@@ -158,6 +296,7 @@ function agregarFilaTabla(){
   }
   document.getElementById("total").innerHTML= "";  
   document.getElementById("total").innerHTML= "₡:"+ total;
+  totalP= total;
 
   document.getElementById("prodVentaAct").innerHTML= "";  
   document.getElementById("prodVentaAct").innerHTML= productosEnVentaActual;  
@@ -178,7 +317,8 @@ function agregarAListaFactura(){
         cantidad= 1;
         var json = JSON.parse(data);        
         var importe= json[0].precioVenta * cantidad;    
-        listaFactura.push([json,cantidad,importe]);
+        var mayoreo= 0;
+        listaFactura.push([json,cantidad,importe,mayoreo]);        
         agregarFilaTabla();
     },
     error: function(error){
@@ -274,8 +414,13 @@ function aumentarCantidad(){
     cantidad= listaFactura[elementRow][1]+ 1;
     existencia= listaFactura[elementRow][0][0].cantidadDeProduct;
     if(cantidad <= existencia)
-      listaFactura[elementRow][1]= cantidad;
-      listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioVenta;   
+      if(listaFactura[elementRow][3] == 0){
+        listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioVenta;     
+      }
+      else{
+        listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioMayoreo;   
+      }      
+      listaFactura[elementRow][1]= cantidad;      
       agregarFilaTabla();
   }
 }
@@ -304,7 +449,9 @@ var keyCode = e.keyCode;
   }
   //F11
   else if(keyCode==122) {
-    alert("You hit the F11.");
+    aplicarMayoreo();
+    agregarFilaTabla();
+    alert("Mayoreo aplicado");
   }
   //F8
   else if(keyCode==119) {

@@ -83,7 +83,6 @@ Route::get('/reporteDeMovimiento', 'InventoryController@movementReportView');
 Route::get('/entradas', 'InventoryController@inComingView');
 Route::get('/salidas', 'InventoryController@outComingView');
 Route::get('/tiqueteVentasDevoluciones', 'InventoryController@billSalesAndReturnsInfoView');
-Route::get('/ventasDevoluciones', 'InventoryController@salesAndReturnsView');
 Route::get('/ventas', 'InventoryController@sellingView');
 Route::get('/ventasPorPeriodo/{initialDate}/{$finalDate}', 'InventoryController@sellingsByPeriod');
 
@@ -110,8 +109,12 @@ Route::put('user/{id}', 'UserController@update');
 
 Auth::routes();
 
-
-
+//nuevas
+Route::post('/devolder/producto/', 'InventoryController@devolverProductos');
+Route::get('/tiqueteVentasDevoluciones/{id}/{total}/{tipoPago}', 'InventoryController@billSalesAndReturnsInfoView');
+Route::get('/ventasDevoluciones/{fecha}', 'InventoryController@salesAndReturnsView');
+Route::get('/facturas/insrtListProv/{id}', 'sellController@findProduct');
+Route::get('/obtener/promociones/sell', 'sellController@obtenerPromocion');
 
 
 

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title></title>
   @include('partials.style')
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.min.css" />
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker3.min.css" />
@@ -19,7 +20,7 @@
         <div class="form-group" style="position: absolute;">
             <div class="col-xs-5 date">
                 <div class="input-group input-append date" id="datePicker">
-                    <input type="text" class="form-control" name="date" />
+                    <input type="text" id="dateInicio" class="form-control" name="date" oninput="insertarRango()"/>
                     <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
                 </div>
             </div>
@@ -29,7 +30,7 @@
     <div class="form-group" style="margin-left: 55%;width: 100%">
         <div class="col-xs-5 date">
             <div class="input-group input-append date" id="datePicker2">
-                <input type="text" class="form-control" name="date" />
+                <input type="text" class="form-control" name="date" oninput="insertarRango()" id="dateFin" />
                 <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
             </div>
         </div>
@@ -51,68 +52,32 @@
       </tr>
    </thead>   
    <tbody>
+      @foreach($registrosHistorial as $registrosHistorial)
         <tr class="row-content">
-            <td>1</td>
-            <td>45</td>
-            <td>12:12</td>
-            <td>23450</td>
+            <td>{{$registrosHistorial->id}}</td>
+            <td>{{$registrosHistorial->cantidadArticulos}}</td>
+            <td>{{$registrosHistorial->hora}}</td>
+            <td>{{$registrosHistorial->monto}}</td>
             <td>
-                <a href="/tiqueteVentasDevoluciones" title="Información" class="btn btn-info" aria-label="Settings">
+                <a href="/tiqueteVentasDevoluciones/{{$registrosHistorial->id}}/{{$registrosHistorial->monto}}/{{$registrosHistorial->tipoPago}}" title="Información" class="btn btn-info" aria-label="Settings">
                     <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                </a>
-                <a title="Eliminar" class="btn btn-danger" aria-label="Settings">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
+                </a>                
             </td>
-        </tr>
-        <tr class="row-content">
-            <td>2</td>
-            <td>689</td>
-            <td>12:12</td>
-            <td>23450</td>
-            <td>
-                <a href="/tiqueteVentasDevoluciones" title="Información" class="btn btn-info" aria-label="Settings">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                </a>
-                <a title="Eliminar" class="btn btn-danger" aria-label="Settings">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
-            </td>
-        </tr>
-        <tr class="row-content">
-            <td>3</td>
-            <td>16</td>
-            <td>12:12</td>
-            <td>23450</td>
-            <td>
-                <a href="/tiqueteVentasDevoluciones" title="Información" class="btn btn-info" aria-label="Settings">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                </a>
-                <a title="Eliminar" class="btn btn-danger" aria-label="Settings">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
-            </td>
-        </tr>
-        <tr class="row-content">
-            <td>4</td>
-            <td>25</td>
-            <td>12:12</td>
-            <td>23450</td>
-            <td>
-                <a href="/tiqueteVentasDevoluciones" title="Información" class="btn btn-info" aria-label="Settings">
-                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-                </a>
-                <a title="Eliminar" class="btn btn-danger" aria-label="Settings">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
-            </td>
-        </tr>
+        </tr>        
+      @endforeach
    </tbody>
   </table>
 </div>
 </body>
 <script src="{{asset('plugins/sweetalert2/sweetalert2.min.js')}}"></script>
 <script>
+
+function insertarRango(){
+  //fechaInicio = document.getElementById("dateInicio").value;
+  //fechaFin = document.getElementById("dateFin").value;
+  alert("") ;
+}
+
 $(document).ready(function() {
     $('#datePicker')
         .datepicker({

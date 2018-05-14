@@ -29,9 +29,42 @@ class sellController extends Controller
              <th>Importe</th>
              <th>Existencia</th>
 	*/	
-    public function findProduct($filterSearchInput){    	
-    	$productos = DB::table('PRODUCTOS')->select('codigoProducto', 'descripcion','precioCosto','precioVenta','precioMayoreo',
+    public function obtenerPromocion(){
+        $idReg = DB::table('PROMOCIONES')->get();
+        return $idReg;      
+    }
+
+    public function insertarEnHistorial(Request $request){
+        $fecha= $request->fecha;
+        $hora= $request->hora;
+        $formaDePago= $request->formaDePago;
+        $listaFactura =$request->listaFactura;
+        $cliente= $request->cliente;
+        $monto= $request->monto;
+        $cantidadProductos= $request->prodVentaAct;
+        $resultado= "Error no se han introducido los datos de forma correcta";
+
+        $insertHist=DB::insert('insert into HISTORIAL(fecha,monto,cliente,tipoPago,cantidadArticulos,hora) values(?,?,?,?,?,?)',[$fecha,$monto,$cliente,$formaDePago,$cantidadProductos,$hora]);
+        if($insertHist){
+            $idReg = DB::table('HISTORIAL')->orderBy('id', 'DESC')->get();
+            for ($i=0; $i < sizeof($listaFactura); $i++) {               
+                DB::insert('insert into PRODUCTOS_COMPRADOS(idHistorial,cantidad,codigoProducto) values(?,?,?)',
+                [$idReg[0]->id, $listaFactura[$i][1],$listaFactura[$i][0]]);
+                
+                DB::update('update PRODUCTOS set cantidadDeProduct=cantidadDeProduct - ? where codigoProducto = ?',[$listaFactura[$i][1],$listaFactura[$i][0]]);
+            }
+            $resultado= "Se ha realizado exitosamente";
+        }        
+        $response = array(
+          'msj' => $resultado,
+        );
+        return response()->json($response); 
+   }
+
+
+    public function findProduct($filterSearchInput){        
+        $productos = DB::table('PRODUCTOS')->select('codigoProducto', 'descripcion','precioCosto','precioVenta','precioMayoreo',
             'nombreDepartamento','cantidadDeProduct','cantMinimaProd')->where('codigoProducto', '=', $filterSearchInput)->get();
-    	return $productos;    	
+        return $productos;      
     }
 }

@@ -84,14 +84,32 @@ class InventoryController extends Controller
         return view('sellingPeriod');
     }
 
-    public function salesAndReturnsView()
+    public function salesAndReturnsView($fecha)
     {
-        return view('salesAndReturns');
+        $registrosHistorial = DB::table('HISTORIAL')->where('fecha', '=', $fecha)->get();        
+        return view('salesAndReturns', compact('registrosHistorial'));
     }
 
-    public function billSalesAndReturnsInfoView()
-    {
-        return view('billSalesAndReturnsInfo');
+    public function devolverProductos(Request $request){        
+
+        $lista = $request->input('lista');        
+        $fecha = $request->input('fecha');
+        $listaProductos = json_decode($lista);        
+        $idHistorial= $listaProductos[0]->idHistorial;               
+                       
+        for ($i=0; $i < sizeof($listaProductos); $i++) {
+            DB::update('update PRODUCTOS set cantidadDeProduct=cantidadDeProduct + ? where codigoProducto = ?',[$listaProductos[$i]->cantidad, $listaProductos[$i]->codigoProducto]); 
+        }
+        DB::table('HISTORIAL')->where('id','=',$idHistorial)->delete();
+        $resultado= "Se ha realizado exitosamente";
+        return view('selling'); 
+    }
+
+
+    public function billSalesAndReturnsInfoView($idHistorial,$total,$tipoPago)
+    {                    
+        $registrosHistorial = DB::table('PRODUCTOS_COMPRADOS')->join('PRODUCTOS', 'PRODUCTOS.codigoProducto', '=', 'PRODUCTOS_COMPRADOS.codigoProducto')->select('PRODUCTOS_COMPRADOS.*', 'PRODUCTOS.descripcion','PRODUCTOS.precioVenta')->where('PRODUCTOS_COMPRADOS.idHistorial','=',$idHistorial)->get();     
+        return view('billSalesAndReturnsInfo',compact('registrosHistorial', 'total','tipoPago'));
     }
     
 

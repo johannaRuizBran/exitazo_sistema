@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title></title>
   @include('partials.style')
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.min.css" />
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker3.min.css" />
-
   <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
 </head>
 <body>
@@ -12,8 +12,14 @@
 <br>
 @include('partials.sellingsMenu')
 <br>
-<a href="#" style="margin-left: 20%" class="btn btn-warning cboxElement">Devolver productos</a>
-<a type="button" value="Add" onclick="findLowInInventoryCoincidencesInRows()" style="margin-left: 20%" class="btn btn-default cboxElement">Imprimir copia</a>
+<form class="form-horizontal" method="post" action="/devolder/producto/" accept-charset="UTF-8">
+  <input type="hidden" name="_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="lista" id="lista" value="{{$registrosHistorial}}">
+  <input type="hidden" name="fecha" id="fecha" value="">
+  <button style="margin-left: 20%" type="submit" class="btn btn-warning cboxElement" onclick="fechainput()">Devolver productos</button>
+  <a type="button" value="Add" onclick="findLowInInventoryCoincidencesInRows()" style="margin-left: 20%" class="btn btn-default cboxElement">Imprimir copia</a>
+</form>
+
 <br>
 <br>    
 <div class="container">
@@ -26,40 +32,36 @@
       </tr>
    </thead>   
    <tbody>
+      @foreach($registrosHistorial as $registrosHistorial)
         <tr class="row-content">
-            <td>14</td>
-            <td>zapatos de cuero</td>
-            <td>23450</td>
+            <td>{{$registrosHistorial->cantidad}}</td>
+            <td>{{$registrosHistorial->descripcion}}</td>
+            <td>{{$registrosHistorial->precioVenta * $registrosHistorial->cantidad}}</td>
         </tr>
-        <tr class="row-content">
-            <td>1</td>
-            <td>zapatos de cuero</td>
-            <td>23450</td>
-        </tr>
-        <tr class="row-content">
-            <td>4</td>
-            <td>zapatos de cuero</td>
-            <td>23450</td>
-        </tr>
-        <tr class="row-content">
-            <td>7</td>
-            <td>zapatos de cuero</td>
-            <td>23450</td>
-        </tr>
+      @endforeach        
    </tbody>
   </table>
 </div>
 <div class="container">
     <div class="row">
-        <h3>Total: 12345678</h3>
+        <h3>Total: {{$total}}</h3>
     </div>
     <div class="row">
-        <h3>Pagó con: Crédito</h3>
+        <h3>Pagó con: {{$tipoPago}}</h3>
     </div>
 </div>
 </body>
 <script src="{{asset('plugins/sweetalert2/sweetalert2.min.js')}}"></script>
 <script>
+function fechainput(){
+  var dt = new Date();
+  var month = dt.getMonth()+1;
+  var day = dt.getDate();
+  var year = dt.getFullYear();
+  var fecha= year + '-' + month + '-' + day;  
+  document.getElementById("fecha").value= fecha;
+}
+
 window.onload = function() {myFunction()};
 function myFunction()
 {
