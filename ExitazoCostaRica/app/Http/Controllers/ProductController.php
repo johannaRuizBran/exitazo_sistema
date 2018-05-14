@@ -21,9 +21,8 @@ class ProductController extends Controller
 
     public function index()
     {
-        $productos = DB::table('PRODUCTOS')->select('codigoProducto', 'descripcion','precioCosto','precioVenta','precioMayoreo',
-            'nombreDepartamento','cantidadDeProduct','cantMinimaProd')->get();
-        return view('createProduct', compact('productos'));        
+        $departamentos = DB::table('DEPARTAMENTOS')->select('nombreDepartamento')->get();
+        return view('createProduct', compact('departamentos'));        
     }
 
     /**
@@ -54,7 +53,8 @@ class ProductController extends Controller
     public function goToUpdateView ($codigoProducto) 
     {
         $product = DB::table('PRODUCTOS')->where('codigoProducto', $codigoProducto)->first();
-        return view('updateProduct', compact('product'));
+        $departamentos = DB::table('DEPARTAMENTOS')->select('nombreDepartamento')->get();
+        return view('updateProduct', compact('product', 'departamentos'));
     }
 
     /**
