@@ -80,7 +80,7 @@
 $(document).ready(function() {
     $('#datePicker')
         .datepicker({
-            format: 'dd/mm/yyyy'
+            format: 'yyyy-mm-dd'
         })
         .on('changeDate', function(e) {
             // Revalidate the date field
@@ -88,7 +88,7 @@ $(document).ready(function() {
         });
     $('#datePicker2')
         .datepicker({
-            format: 'dd/mm/yyyy'
+            format: 'yyyy-mm-dd'  
         })
         .on('changeDate', function(e) {
             // Revalidate the date field
@@ -161,8 +161,8 @@ function getReport() {
 }
 
 function obtenerDatos(){  
-  var initial = '2018-05-13';// document.getElementById("date1").value;
-  var final ='2018-12-31';// document.getElementById("date2").value;   
+  var initial = document.getElementById("date1").value;
+  var final = document.getElementById("date2").value;   
   $.ajax({
     url:"/ventas/periodo/obtener",
     type:"GET",  

@@ -43,12 +43,11 @@
       </div>
       <div class="form-group">
           <label for="inputNombreDepartamento" class="control-label col-xs-2">Departamento</label>
-          <select style="width: 39%;margin-left: 18%" class="input form-control pdi-spacing-02" id="inputNombreDepartamento" name="inputNombreDepartamento">
-              <option>Seleccione el departamento...</option>
-              <option value="zapatos">Zapatos</option>
-              <option value="bolsos">Bolsos</option>
-              <option value="cuero">Cuero</option>
-              <option value="fajas">Fajas</option>
+          <select style="width: 39%;margin-left: 18%" class="input form-control pdi-spacing-02" id="inputDep" name="inputDep">
+            <option>Seleccione el departamento...</option>
+            @foreach($departamentos as $departamento) 
+              <option>{{$departamento->nombreDepartamento}}</option>
+            @endforeach 
           </select>
       </div>
       <div class="form-group">
