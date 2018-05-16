@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use DB;
 use App\Quotation;
 use Redirect;
@@ -43,11 +44,8 @@ class sellController extends Controller
         $monto= $request->monto;
         $cantidadProductos= $request->prodVentaAct;        
         $resultado= "Error no se han introducido los datos de forma correcta";
-
-        DB::update('update CLIENTES set saldoActual=saldoActual + ? where numeroPersona = ?',[$monto,$cliente]);
-
-        DB::insert('insert into MOVIMIENTOS_CAJAS(tipo,motivo,nombreLocal,montoDinero,fecha) values(?,?,?,?,?)',
-            ['credito','venta de producto','nombreLocal',$monto,$fecha]);        
+        
+        DB::update('update CLIENTES set saldoActual=saldoActual + ? where numeroPersona = ?',[$monto,$cliente]);            
 
         $insertHist=DB::insert('insert into HISTORIAL(fecha,monto,cliente,tipoPago,cantidadArticulos,hora) values(?,?,?,?,?,?)',[$fecha,$monto,$cliente,$formaDePago,$cantidadProductos,$hora]);        
         if($insertHist){
@@ -57,9 +55,12 @@ class sellController extends Controller
                 [$idReg[0]->id, $listaFactura[$i][1],$listaFactura[$i][0],$listaFactura[$i][2]]);
                 
                 DB::update('update PRODUCTOS set cantidadDeProduct=cantidadDeProduct - ? where codigoProducto = ?',[$listaFactura[$i][1],$listaFactura[$i][0]]);
+
+                DB::insert('insert into MOVIMIENTOS_PRODUCTOS(codigoProducto,tipoMovimientoProd,fechaMovimiento,hora,cantidad,cajero,nombreDepartamento,habia,nombreLocal) values(?,?,?,?,?,?,?,?,?)',
+                [$listaFactura[$i][0],'salida',$fecha,$hora,$listaFactura[$i][1],Auth::user()->name, $listaFactura[$i][4], $listaFactura[$i][3], 'local uno']);
             }
             $resultado= "Se ha realizado exitosamente";
-        }        
+        }                
         $response = array(
           'msj' => $resultado,
         );

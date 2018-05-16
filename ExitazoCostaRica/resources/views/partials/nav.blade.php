@@ -14,7 +14,7 @@
         <li><a id="navSellings" href="/ventas">Ventas</a></li>
         <li><a id="navCustomers" href="/clientes">Clientes</a></li>
         <li><a id="navInventories" href="/inventario">Inventarios</a></li>
-        <li><a id="navEnds" href="/corte">Cortes</a></li>
+        <li><a id="navEnds" onclick="irAVistaCortes()">Cortes</a></li>
         <li><a id="navConfig" href="/config">Configuración</a></li>
         <li><a class="dropdown-item" href="{{ route('logout') }}"
            onclick="event.preventDefault();
@@ -30,3 +30,15 @@
   </div><!-- /.container -->
 </nav><!-- /.navbar -->
 @endif
+
+<script type="text/javascript">
+  function irAVistaCortes(){
+    var dt = new Date();
+    var month = dt.getMonth()+1;
+    var day = dt.getDate();
+    var year = dt.getFullYear();
+    var fecha= year + '-' + month + '-' + day;  
+    alert("dasdas");
+    window.location.href="/corte/"+fecha;
+  }
+</script>

@@ -59,8 +59,11 @@ class InventoryController extends Controller
         return view('createInComing');
     }
 
-    public function showCutStadisticsView()
+    public function showCutStadisticsView($fecha)
     {
+        $initialDate= $fecha;
+        $finalDate= $fecha;
+
         if ($initialDate == 0) {
              $initialDate = date('Y-m-d');
              if ($finalDate == 0) {
@@ -74,12 +77,20 @@ class InventoryController extends Controller
         $finalDate = date_format(date_create($finalDate), 'Y-m-d');
         $initialDate = date_format(date_create($initialDate), 'Y-m-d');
         $finalDate = date_format(date_create($finalDate), 'Y-m-d');
+
+        $dineroInicialCaja=DB::table('LOCALES')->where('nombreLocal', '=', 'local uno')->get();
+
         $pagosContado = DB::select('call pagosContado(?,?)',[$initialDate,$finalDate]);
+
         $ventasDepartamento = DB::select('call ventasDepartamento(?,?)',[$initialDate,$finalDate]);
+
         $pagoClientes = DB::select('call pagoClientes(?,?)',[$initialDate,$finalDate]);
+
         $repagoProveedoressults = DB::select('call pagoProveedores(?,?)',[$initialDate,$finalDate]);
+        
         $reporteMovimientos = DB::select('call reporteMovimientos(?,?)',[$initialDate,$finalDate]);
-        return view('showCutStadistics', compact('pagosContado', 'ventasDepartamento', 'pagoClientes', 'repagoProveedoressults', 'reporteMovimientos'));
+        
+        return view('showCutStadistics', compact('pagosContado', 'ventasDepartamento', 'pagoClientes', 'repagoProveedoressults', 'reporteMovimientos','dineroInicialCaja'));
         //return view('showCutStadistics');
     }
 

@@ -48,8 +48,8 @@
       <tbody>
         <tr>
           <td>0</td>
-          <td>73000</td>
-          <td>73000</td>
+          <td>{{$dineroInicialCaja[0]->dineroInicialCaja}}</td>
+          <td>{{$dineroInicialCaja[0]->dineroInicialCaja}}</td>
         </tr>
       </tbody>
     </table>
@@ -67,7 +67,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>579000</td>
+          <td>{{$pagosContado[0]->monto}}</td>
           <td>73000</td>
           <td>569000</td>
           <td>8252</td>

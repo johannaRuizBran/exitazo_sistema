@@ -233,7 +233,7 @@ function insertarPagoEnTablaHist(formaDePago,listaDeProductos,
   var hora= cad=dt.getHours()+":"+dt.getMinutes();   
   listaDeCodigos=[];  
   for (var i = 0; i < listaFactura.length; i++) {
-    listaDeCodigos.push([listaFactura[i][0][0].codigoProducto,listaFactura[i][1],listaFactura[i][2]]);    
+    listaDeCodigos.push([listaFactura[i][0][0].codigoProducto,listaFactura[i][1],listaFactura[i][2], listaFactura[i][0][0].cantidadDeProduct,listaFactura[i][0][0].nombreDepartamento]);    
   }      
   var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');  
   $.ajax({      
@@ -441,6 +441,7 @@ function addBill() {
   bill.appendChild(element);      
   listaPendientes.push([billNumber,listaFactura]);      
   listaFactura= [];  
+  limpiarTodosDatos();
   agregarFilaTabla();
 }
 

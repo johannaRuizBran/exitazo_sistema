@@ -101,7 +101,7 @@ Route::get('/crearProducto', 'ProductController@index');
 Route::get('/crearPromocion', 'PromotionController@index');
 Route::get('/crearSalida', 'InventoryController@createOutComingView');
 
-Route::get('/corte', 'InventoryController@showCutStadisticsView');
+Route::get('/corte/{fecha}', 'InventoryController@showCutStadisticsView');
 //Update views
 Route::get('/editar/producto/{codigoProducto}', 'ProductController@goToUpdateView');
 Route::get('/editar/cliente/{numeroPersona}', 'CustomerController@goToUpdateView');
