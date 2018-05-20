@@ -451,6 +451,7 @@ function insertarPagoEnTablaHist(formaDePago,listaDeProductos,
         mensajeParaUsuario(titulo, msj, icon);        
       },
       error: function(error){
+        alert(error);
         titulo= "Error";
         msj= "Error: no se ha realizado la compra correctamente";
         icon="error";
@@ -709,8 +710,7 @@ function buscarEnPendientes(id){
   }
 }
 
-function deleteBill() {
-  alert(billNumber);
+function deleteBill() {  
   var item = findBill();  
   if(billNumber >1){      
       item.parentNode.removeChild(item);                  
