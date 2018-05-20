@@ -29,8 +29,8 @@ class InventoryController extends Controller
     public function customerView()
     {
         $clientes = DB::table('CLIENTES')->select('numeroPersona', 'nombrePersona','direccion','telefono','limiteDeCredito',
-            'saldoActual')->get();        
-        return view('findCustomer', compact('clientes'));
+            'saldoActual')->get();  
+        return view('customers', compact('clientes'));
     }
 
     public function createClient(Request $request){
