@@ -30,9 +30,54 @@ class sellController extends Controller
              <th>Importe</th>
              <th>Existencia</th>
 	*/	
+
+    public function obtenerDatosBDFacturas(){
+        $nombreCajero= Auth::user()->name;                   
+        $result= DB::table('PRODUCTOS_FACTURAS')->where('nombreCajero', '=', $nombreCajero)->get();
+        return $result;
+    }
+
     public function obtenerPromocion(){
         $idReg = DB::table('PROMOCIONES')->get();
         return $idReg;      
+    }
+
+    public function insertarEnListaFacturas(Request $request){        
+        $listaFacturaPendiente =$request->listaPendientes;               
+        $resultado= $listaFacturaPendiente; 
+        $nombreCajero= Auth::user()->name;                   
+        $resultado2="";
+        $resultado3="";        
+        try{            
+            if( sizeof($listaFacturaPendiente) > 1){
+                DB::table('PRODUCTOS_FACTURAS')->where('nombreCajero', '=', $nombreCajero)->delete();
+            }
+            for ($i=1;  $i< sizeof($listaFacturaPendiente) ; $i++) {
+                $listaFactura= $listaFacturaPendiente[$i][1];            
+                $billNumber= $listaFacturaPendiente[$i][0];
+                $resultado2=  $listaFacturaPendiente[$i];
+                for ($j=0;  $j< sizeof($listaFactura) ; $j++) {
+                    $json=$listaFactura[$j][0];
+                    $cantidad= $listaFactura[$j][1];
+                    $importe= $listaFactura[$j][2];
+                    $mayoreo= $listaFactura[$j][3];                     
+                    for ($k=0; $k < sizeof($json); $k++) {
+                        $codigoProducto= $json[$k]['codigoProducto'];
+                        DB::insert('insert into PRODUCTOS_FACTURAS(nombreCajero,cantidad,importe,mayoreo,billNumber,idProducto) values(?,?,?,?,?,?)',[$nombreCajero,$cantidad,$importe,$mayoreo,$billNumber,$codigoProducto]);  
+                    }
+                }
+            }       
+            $response = array(
+              'msj1' => $resultado,
+              'mes2'=>$resultado2
+            );
+        }
+        catch (Exception $e){
+            $response = array(
+              'msj' => $e
+            );
+        }                
+        return response()->json($response); 
     }
 
     public function insertarEnHistorial(Request $request){

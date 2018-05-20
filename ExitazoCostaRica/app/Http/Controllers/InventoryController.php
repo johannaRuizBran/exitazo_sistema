@@ -131,6 +131,7 @@ class InventoryController extends Controller
             DB::update('update PRODUCTOS set cantidadDeProduct=cantidadDeProduct + ? where codigoProducto = ?',[$listaProductos[$i]->cantidad, $listaProductos[$i]->codigoProducto]); 
         }
         DB::table('HISTORIAL')->where('id','=',$idHistorial)->delete();
+
         $resultado= "Se ha realizado exitosamente";
         return view('selling'); 
     }
@@ -175,7 +176,9 @@ class InventoryController extends Controller
         $lista=[];
         $clientes = DB::table('CLIENTES')->select('numeroPersona', 'nombrePersona','direccion','telefono','limiteDeCredito',
             'saldoActual')->get(); 
-        return view('selling',compact('lista','clientes'));
+        $productos = DB::table('PRODUCTOS')->select('codigoProducto', 'descripcion','precioCosto','precioVenta','precioMayoreo',
+            'nombreDepartamento','cantidadDeProduct','cantMinimaProd')->get();   
+        return view('selling',compact('lista','clientes','productos'));
     }
 
     public function movementReportView()

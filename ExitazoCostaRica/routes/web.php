@@ -119,3 +119,5 @@ Route::get('/facturas/insrtListProv/{id}', 'sellController@findProduct');
 Route::get('/obtener/promociones/sell', 'sellController@obtenerPromocion');
 Route::post('/crear/historialCompra', 'sellController@insertarEnHistorial');
 
+Route::post('/insertarListaFacturas', 'sellController@insertarEnListaFacturas');
+Route::get('/obtener/datosFacturas', 'sellController@obtenerDatosBDFacturas');

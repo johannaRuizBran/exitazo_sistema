@@ -10,12 +10,88 @@
 
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-  @include('partials.style')
+@include('partials.style')
 </head>
 <body>
 @include('partials.nav')
 <br>
-@include('partials.sellingsMenu')
+<div class="container">
+  <div class="row">
+    <div class="btn-group" role="group" aria-label="...">
+      <a id="buttonBill" href="/ventas" class="btn btn-default cboxElement">Facturas</a>
+      <a id="buttonvarious" href="#" class="btn btn-default cboxElement" data-toggle="collapse" data-target="#cantidadCollapside">INS Varios</a>
+      <a id="buttonFind" href="#" class="btn btn-default cboxElement" data-toggle="collapse" data-target="#buscarProductoCollapside">F10 Buscar</a>
+      <a id="buttonDetail" class="btn btn-default cboxElement" onclick="quitarMayoreo()">Detalle</a>
+      <a id="buttonWholesale" onclick="aplicarMayoreo()" class="btn btn-default cboxElement">F11 Mayoreo</a>
+      <a id="buttonInComing" href="/entradas" class="btn btn-default cboxElement">F7 Entradas</a>
+      <a id="buttonOutComing" href="/salidas" class="btn btn-default cboxElement">F8 Salidas</a>
+    </div>
+    <div id="cantidadCollapside" class="collapse">    
+      <br>
+      <br>
+      <span>Código: </span><input type="text" name="codigo" id="codigoInput">
+      <span style="margin-left: 2%">Valor: </span><input type="text" name="valor" id="valorCantidadInput">
+      <button data-toggle="collapse" onclick="insertaCantidaDeMuchas()" data-target="#cantidadCollapside">OK</button>
+    </div>    
+
+    <div id="buscarProductoCollapside" class="collapse">
+      <div>
+        <br>
+        <br>      
+        <div class="container">
+        <div class="row">
+           <div id="custom-search-input">
+                <div class="input-group col-md-12">
+                    <input onkeyup="findCoincidencesInRows()" id="filterSearchInput" type="text" class="search-query form-control" placeholder="" />
+                    <span class="input-group-btn">
+                        <button class="btn bg-dark" type="button">
+                            <span class=" glyphicon glyphicon-search"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="container">  
+        <table id="contentTable" class="table table-striped">
+         <thead>      
+            <tr class="row-name">
+               <th>Código de barras</th>
+               <th>Descripción</th>
+               <th>Precio costo</th>
+               <th>Precio venta</th>
+               <th>Precio mayoreo</th>
+               <th>Departamento</th>
+               <th>Cantidad actual</th>
+               <th>Agregar</th>
+            </tr>
+         </thead>   
+         <tbody>
+            @foreach($productos as $productos)
+              <tr class="row-content">
+               <td>{{$productos->codigoProducto}}</td>
+               <td>{{$productos->descripcion}}</td>
+               <td>{{$productos->precioCosto}}</td>
+               <td>{{$productos->precioVenta}}</td>
+               <td>{{$productos->precioMayoreo}}</td>
+               <td>{{$productos->nombreDepartamento}}</td>
+               <td>{{$productos->cantidadDeProduct}}</td>
+               <td>
+                  <a title="Seleccionar" class="btn btn-primary" onclick="agregarListaFactAajax('{{$productos->codigoProducto}}')" aria-label="Settings">
+                    <span class="glyphicon glyphicon-send"></span>
+                  </a>
+               </td>
+              </tr>        
+            @endforeach      
+         </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    </div>    
+  </div>
+</div>
 <br>
 <div class="container">
   <div class="row">
@@ -85,10 +161,23 @@
     <br>
     <div id="demo" class="collapse">
       <br>
-      @include('partials.filterSearchBar')
+      <div class="container">
+          <div class="row">
+             <div id="custom-search-input">
+                  <div class="input-group col-md-12">
+                      <input onkeyup="findCoincidencesInRowsClient()" id="filterSearchInputClient" type="text" class="search-query form-control" placeholder="" />
+                      <span class="input-group-btn">
+                          <button class="btn bg-dark" type="button">
+                              <span class=" glyphicon glyphicon-search"></span>
+                          </button>
+                      </span>
+                  </div>
+              </div>
+          </div>
+      </div>
       <br>
       <div class="container">  
-        <table id="contentTable" class="table table-striped">
+        <table id="contentTableClient" class="table table-striped">
          <thead>
             <tr class="row-name">
                <th>Número</th>
@@ -130,7 +219,9 @@
   </div>  
 </body>
 <script>
-  function findCoincidencesInRows() {
+
+
+function findCoincidencesInRows() {
   var input, filter, table, tr, td, i;
   input = document.getElementById("filterSearchInput");
   filter = input.value.toUpperCase();
@@ -146,6 +237,48 @@
       }
     } 
   }
+}
+
+function findCoincidencesInRowsClient() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("filterSearchInputClient");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("contentTableClient");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    } 
+  }
+} 
+
+
+function insertarListasEnBD(){ 
+  console.log("en listado") ;
+  console.log(listaPendientes);
+  console.log("en listado final") ;
+  var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');  
+  $.ajax({      
+      url: '/insertarListaFacturas',
+      type: 'POST',      
+      data: {_token: CSRF_TOKEN, 
+        listaPendientes:listaPendientes},
+        dataType: 'JSON',      
+      success: function (data) {         
+        console.log(data);                
+      },
+      error: function(error){
+        titulo= "Error";
+        msj= "Error: no se han actualizado los datos de forma NO local";
+        icon="error";
+        mensajeParaUsuario(titulo, msj, icon);
+      }
+  });      
 }
 
 function promocion(){  
@@ -221,6 +354,67 @@ function limpiarTodosDatos(){
   document.getElementById("total").innerHTML= "";
   document.getElementById("cambioInpu").innerHTML= "₡:"+ totalP; 
   document.getElementById("total").innerHTML= "₡:"+ totalP;
+}
+var cantidad= 1;
+var importe= 0;  
+var mayoreo= 0;
+var nuevoDat= "si";
+function obtenerDatosFacturasDeBD(){  
+  $.ajax({
+    url:"/obtener/datosFacturas",
+    type:"GET",
+    dataType: 'text',
+    success: function(data){                      
+      var jsonFacturas = JSON.parse(data);
+      console.log("jsonFacturas");
+      console.log(jsonFacturas);               
+      nueva= "no";
+      listaIdVisitado=[];      
+      listaFinal=[];                  
+      for (var i = 0; i< jsonFacturas.length; i++) {
+        lis=[];        
+        var billActual=jsonFacturas[i].billNumber;
+        if(listaIdVisitado.indexOf(billActual) == -1){          
+          listaIdVisitado.push(billActual);
+          for(var j = 0; j< jsonFacturas.length; j++) {                      
+            if(jsonFacturas[j].billNumber == jsonFacturas[i].billNumber){
+              lis.push(jsonFacturas[j]);
+            }            
+          } 
+        }
+        if(lis.length != 0){
+          listaFinal.push(lis);
+        }        
+      } 
+      nuevoDat= "no";
+      for(var i=0; i< listaFinal.length; i++){
+        for(var j= 0; j<listaFinal[i].length; j++){
+          
+          cantidad= listaFinal[i][j].cantidad;
+          importe= listaFinal[i][j].importe;  
+          mayoreo= listaFinal[i][j].mayoreo;
+          billNumber= listaFinal[i][j].billNumber-1;
+          idProducto= listaFinal[i][j].idProducto;     
+          agregarListaFactAajax(idProducto,nueva);              
+        }        
+        console.log("LISTA FACTURAS");             
+        console.log(listaFactura); 
+        addBill();
+      }
+      nuevoDat= "si";
+
+      //idProducto= jsonFacturas[i].idProducto;            
+            //agregarListaFactAajax(idProducto,nueva);
+      console.log("LISTA PENDIENTES");             
+        console.log(listaPendientes); 
+      console.log("Final");             
+      console.log(listaFinal);    
+    },
+    error: function(error){
+         console.log("Error:");
+         console.log(error);
+    }
+  }); 
 }
 
 function insertarPagoEnTablaHist(formaDePago,listaDeProductos,
@@ -304,14 +498,49 @@ function seleccionarElementoTabla(id) {
   elementRow= id;    
 }
 
+function quitarMayoreo(){
+  for (var i = 0; i< listaFactura.length; i++) {        
+    listaFactura[i][3]= 0;
+    listaFactura[i][2]=listaFactura[i][1] * listaFactura[i][0][0].precioVenta;
+  }
+  agregarFilaTabla();
+  alert("Mayoreo NO aplicado");
+}
+
 function aplicarMayoreo(){  
   for (var i = 0; i< listaFactura.length; i++) {        
     listaFactura[i][3]= 1;
     listaFactura[i][2]=listaFactura[i][1] * listaFactura[i][0][0].precioMayoreo;
   }
+  agregarFilaTabla();
+  alert("Mayoreo aplicado");
 }
-  
-function agregarFilaTabla(){  
+
+
+function insertaCantidaDeMuchas() {
+    inseVar_codigoProducto= document.getElementById("codigoInput").value;
+    inseVar_cantCodigoProd= document.getElementById("valorCantidadInput").value;    
+    for (var i = 0; i < listaFactura.length; i++) {
+      producto= listaFactura[i][0][0].codigoProducto;
+      if(producto == inseVar_codigoProducto){
+        cantidad= listaFactura[i][1];
+        existencia= listaFactura[i][0][0].cantidadDeProduct;
+        if(cantidad>0 && existencia>=inseVar_cantCodigoProd){          
+          if(listaFactura[i][3] == 0){                      
+            listaFactura[i][2]=inseVar_cantCodigoProd * listaFactura[i][0][0].precioVenta;     
+          }
+          else{            
+            listaFactura[i][2]=inseVar_cantCodigoProd * listaFactura[i][0][0].precioMayoreo;   
+          }                
+          listaFactura[i][1]= inseVar_cantCodigoProd;          
+          agregarFilaTabla();
+        } 
+      }            
+    }    
+  }
+
+
+function agregarFilaTabla(){    
   var total= 0;
   var productosEnVentaActual= 0;
   var precioVenta;
@@ -336,8 +565,8 @@ function agregarFilaTabla(){
     var td_precioVenta = document.createElement('td');
     td_precioVenta.innerHTML = precioVenta;
     
-    var td_cantidad = document.createElement('td');
-    td_cantidad.innerHTML = listaFactura[i][1];
+    var td_cantidad = document.createElement('td');    
+    td_cantidad.innerHTML = listaFactura[i][1];    
 
     var td_importe = document.createElement('td');
     td_importe.innerHTML = listaFactura[i][2];
@@ -347,7 +576,7 @@ function agregarFilaTabla(){
     td_cantidadDePExist.innerHTML = listaFactura[i][0][0].cantidadDeProduct;
 
     var td_botonEliminar = document.createElement('td');
-    td_botonEliminar.innerHTML = "<button class='btn btn-danger edit' aria-label='Settings' onclick= 'eliminarDeLista("+i+")'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";        
+    td_botonEliminar.innerHTML = "<button class='btn btn-danger edit' aria-label='Settings' onclick= 'eliminarDeLista("+i+")'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button>";            
     tr.appendChild(td_codigoProducto);
     tr.appendChild(td_descripcion);
     tr.appendChild(td_precioVenta);
@@ -372,19 +601,24 @@ function eliminarDeLista(id){
   agregarFilaTabla();
 }
 
-function agregarAListaFactura(){
-  var elemento=document.getElementById('filterSearchInput2').value;  
+function agregarListaFactAajax(elementoID, nueva){  
   $.ajax({
-    url:"/facturas/insrtListProv/"+elemento,
+    url:"/facturas/insrtListProv/"+elementoID,
     type:"GET",
     dataType: 'text',
     success: function(data){        
-        cantidad= 1;
         var json = JSON.parse(data);        
-        var importe= json[0].precioVenta * cantidad;    
-        var mayoreo= 0;
-        listaFactura.push([json,cantidad,importe,mayoreo]);        
-        agregarFilaTabla();
+        if(nueva== "si"){
+          cantidad= 1;
+          importe= json[0].precioVenta * cantidad;    
+          mayoreo= 0;  
+          listaFactura.push([json,cantidad,importe,mayoreo]);        
+          agregarFilaTabla();
+        } 
+        else{
+          listaFactura.push([json,cantidad,importe,mayoreo]);          
+        }     
+        
     },
     error: function(error){
          console.log("Error:");
@@ -393,8 +627,16 @@ function agregarAListaFactura(){
   });
 }
 
+function agregarAListaFactura(){
+  var elemento=document.getElementById('filterSearchInput2').value;
+  nueva= "si";
+  agregarListaFactAajax(elemento, nueva);    
+}
 
-window.onload = function() {loadSite()};
+
+window.onload = function() {  
+  obtenerDatosFacturasDeBD();
+  loadSite()};
 function loadSite() {
   var t = document.getElementById("test");
   t.href = "/inventario";
@@ -419,14 +661,18 @@ function onclickBoton(id){
     agregarFilaTabla();
   }
   else{    
-    listaFactura= listaPendientes[id-1][1];          
-    selectedBill= id;    
-    agregarFilaTabla();
+    for (var i = 0; listaPendientes.length > i; i++) {
+      if(listaPendientes[i][0]== id){
+        listaFactura= listaPendientes[i][1];          
+        selectedBill= id;    
+        agregarFilaTabla();
+      }
+    }    
   }  
 }
 
 function addBill() {
-  billNumber = listaPendientes.length+1;  
+  billNumber = billNumber+1;  
   var element = document.createElement("input");
   element.setAttribute("type", "button");
   if(billNumber == 1){
@@ -439,7 +685,10 @@ function addBill() {
   element.setAttribute("onclick", "onclickBoton("+billNumber+")");  
   var bill = document.getElementById("billBar");
   bill.appendChild(element);      
-  listaPendientes.push([billNumber,listaFactura]);      
+  listaPendientes.push([billNumber,listaFactura]);   
+  if(nuevoDat == "si"){
+    insertarListasEnBD();
+  }
   listaFactura= [];  
   limpiarTodosDatos();
   agregarFilaTabla();
@@ -454,15 +703,14 @@ function findBill() {
 function buscarEnPendientes(id){
   for (var i = 0; i < listaPendientes.length ; i++) {
     if(listaPendientes[i][0]== id){
-      alert("se encontro elemento en pos");
-      alert(i);
+      listaPendientes.splice(i,1);      
+      return;
     }
   }
 }
 
 function deleteBill() {
-  var item = findBill();
-  billNumber -= 1;
+  var item = findBill();  
   if(billNumber >0){      
       item.parentNode.removeChild(item);                  
   }  
@@ -470,16 +718,17 @@ function deleteBill() {
     billNumber= 1;
   }  
   listaFactura= [];
-  //buscarEnPendientes(selectedBill);
+  buscarEnPendientes(selectedBill);
   console.log(listaPendientes);
   onclickBoton(1);
 }
+
 
 function aumentarCantidad(){
   if(elementRow < listaFactura.length)  {
     cantidad= listaFactura[elementRow][1]+ 1;
     existencia= listaFactura[elementRow][0][0].cantidadDeProduct;
-    if(cantidad <= existencia)
+    if(cantidad <= existencia){
       if(listaFactura[elementRow][3] == 0){
         listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioVenta;     
       }
@@ -488,6 +737,7 @@ function aumentarCantidad(){
       }      
       listaFactura[elementRow][1]= cantidad;      
       agregarFilaTabla();
+    }      
   }
 }
 
@@ -495,8 +745,13 @@ function disminuirCantidad(){
   if(elementRow < listaFactura.length)  {
     cantidad= listaFactura[elementRow][1]-1;
     if(cantidad > 0){
-      listaFactura[elementRow][1]= cantidad;
-      listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioVenta;
+      if(listaFactura[elementRow][3] == 0){
+        listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioVenta;     
+      }
+      else{
+        listaFactura[elementRow][2]=cantidad * listaFactura[elementRow][0][0].precioMayoreo;   
+      }      
+      listaFactura[elementRow][1]= cantidad;            
       agregarFilaTabla();
     }
   }
@@ -515,9 +770,7 @@ var keyCode = e.keyCode;
   }
   //F11
   else if(keyCode==122) {
-    aplicarMayoreo();
-    agregarFilaTabla();
-    alert("Mayoreo aplicado");
+    aplicarMayoreo();    
   }
   //F8
   else if(keyCode==119) {
