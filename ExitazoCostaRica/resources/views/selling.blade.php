@@ -635,7 +635,7 @@ function agregarAListaFactura(){
 
 
 window.onload = function() {  
-  obtenerDatosFacturasDeBD();
+  //obtenerDatosFacturasDeBD();
   loadSite()};
 function loadSite() {
   var t = document.getElementById("test");
@@ -686,9 +686,9 @@ function addBill() {
   var bill = document.getElementById("billBar");
   bill.appendChild(element);      
   listaPendientes.push([billNumber,listaFactura]);   
-  if(nuevoDat == "si"){
+  /*if(nuevoDat == "si"){
     insertarListasEnBD();
-  }
+  }*/
   listaFactura= [];  
   limpiarTodosDatos();
   agregarFilaTabla();
@@ -710,8 +710,9 @@ function buscarEnPendientes(id){
 }
 
 function deleteBill() {
+  alert(billNumber);
   var item = findBill();  
-  if(billNumber >0){      
+  if(billNumber >1){      
       item.parentNode.removeChild(item);                  
   }  
   else{

@@ -104,8 +104,9 @@ class sellController extends Controller
                 DB::insert('insert into MOVIMIENTOS_PRODUCTOS(codigoProducto,tipoMovimientoProd,fechaMovimiento,hora,cantidad,cajero,nombreDepartamento,habia,nombreLocal) values(?,?,?,?,?,?,?,?,?)',
                 [$listaFactura[$i][0],'salida',$fecha,$hora,$listaFactura[$i][1],Auth::user()->name, $listaFactura[$i][4], $listaFactura[$i][3], 'local uno']);
             }
-            $resultado= "Se ha realizado exitosamente";
+            
         }                
+        $resultado= "Se ha realizado exitosamente";
         $response = array(
           'msj' => $resultado,
         );
